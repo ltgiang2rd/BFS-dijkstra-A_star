@@ -42,25 +42,12 @@ dsa/
 ## Yêu cầu hệ thống
 
 - **Python**: 3.10 hoặc cao hơn
-- **Môi trường**: Conda (môi trường `htkh` như đã chỉ định)
 
 ---
 
 ## Hướng dẫn cài đặt
 
-### 1. Clone hoặc tải dự án về
-
-```bash
-cd /home/ltgiang2/work/dsa
-```
-
-### 2. Kích hoạt môi trường Conda
-
-```bash
-conda activate htkh
-```
-
-### 3. Cài đặt các thư viện cần thiết
+### Cài đặt các thư viện cần thiết
 
 ```bash
 pip install -r requirements.txt
@@ -187,22 +174,7 @@ Xem file `report.md` để đọc báo cáo đầy đủ bao gồm:
 
 ---
 
-## Tác giả
-
-Dự án được phát triển cho môn học Data Structures & Algorithms.
-
----
-
 ## Tài liệu tham khảo chính
 
 - Rosen, K. H. (2019). *Discrete Mathematics and Its Applications* (8th ed.). McGraw-Hill Education. Chapter 10: Graphs.
 - Cormen, T. H., et al. (2009). *Introduction to Algorithms* (3rd ed.). MIT Press.
-
----
-
-## Liên hệ & Hỗ trợ
-
-Nếu có vấn đề khi chạy, kiểm tra:
-1. Python version: `python --version` (cần >= 3.10)
-2. Các thư viện đã cài đặt: `pip list`
-3. Môi trường conda đã kích hoạt: `conda env list`
