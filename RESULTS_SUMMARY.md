@@ -142,13 +142,17 @@ Xem chi tiết trong thư mục `outputs/`:
 
 ## 🎓 Độ phức tạp Lý thuyết
 
-| Thuật toán | Time Complexity | Space | Optimal? |
-|------------|-----------------|-------|----------|
-| BFS | O(V + E) | O(V) | ❌ |
-| Dijkstra | O((V+E) log V) | O(V) | ✅ |
-| A* | O((V+E) log V)* | O(V) | ✅ |
+| Thuật toán | Time Complexity | Space | Optimal? | Ghi chú |
+|------------|-----------------|-------|----------|---------|
+| BFS | O(V + E) | O(V) | ❌ | Nhanh nhưng không đúng với trọng số |
+| Dijkstra | O((V+E) log V) | O(V) | ✅ | Đúng nhưng duyệt nhiều nodes |
+| A* | O((V+E) log V)* | O(V) | ✅ | **Đúng VÀ nhanh** |
 
-*A* có worst-case giống Dijkstra nhưng **thực tế nhanh hơn nhiều** nhờ heuristic!
+**Giải thích**:
+- A* có worst-case giống Dijkstra nhưng **thực tế nhanh hơn 44-80%**
+- Lý do: A* duyệt ít nodes hơn nhờ heuristic (20-56% so với Dijkstra)
+- Ví dụ: Đồ thị 100 nodes, A* duyệt 40 → tiết kiệm ~60% operations
+- Factor log V tăng chậm (log 1000 chỉ ≈ 10) → scale tốt với đồ thị lớn
 
 ---
 

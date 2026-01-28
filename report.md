@@ -32,9 +32,19 @@ BFS là thuật toán tìm kiếm theo chiều rộng, duyệt các đỉnh theo
 - Đảm bảo tìm được đường đi với số cạnh ít nhất (không phải khoảng cách ngắn nhất)
 
 #### Độ phức tạp thời gian
+
+**Phân tích**:
 - **O(V + E)** trong đó:
-  - V: số đỉnh
-  - E: số cạnh
+  - V: số đỉnh (vertices)
+  - E: số cạnh (edges)
+
+**Giải thích**:
+- Mỗi đỉnh được thăm **đúng 1 lần** → O(V)
+- Khi thăm một đỉnh, thuật toán duyệt qua tất cả các cạnh kề của nó
+- Tổng số cạnh được xét qua toàn bộ thuật toán là O(E)
+- **Tổng cộng**: O(V + E)
+
+**Đánh giá**: Đây là độ phức tạp tối ưu cho việc duyệt đồ thị, không thể tốt hơn vì phải xét tất cả đỉnh và cạnh.
 
 #### Ưu điểm
 - Đơn giản, dễ cài đặt
@@ -57,11 +67,31 @@ Thuật toán Dijkstra là thuật toán tham lam (greedy) tìm đường đi ng
 - Kết thúc khi đạt đến đỉnh đích
 
 #### Độ phức tạp thời gian
-- **O((V + E) log V)** khi sử dụng Min-Heap (Binary Heap)
-- **O(V²)** khi sử dụng mảng đơn giản
 
-Trong cài đặt của chúng ta (sử dụng `heapq`):
-- **O((V + E) log V)**
+**Phân tích theo cấu trúc dữ liệu**:
+
+1. **Với Binary Min-Heap (cài đặt trong dự án này)**:
+   - **O((V + E) log V)**
+   
+   **Giải thích chi tiết**:
+   - Khởi tạo: O(1)
+   - **Push vào heap**: Mỗi đỉnh có thể được push vào heap nhiều lần (khi tìm được đường đi tốt hơn)
+     - Số lần push tối đa: O(E) (mỗi cạnh có thể trigger một lần push)
+     - Chi phí mỗi lần push: O(log V)
+     - Tổng: **O(E log V)**
+   - **Pop từ heap**: Mỗi đỉnh chỉ được pop (visited) đúng 1 lần
+     - Số lần pop: O(V)
+     - Chi phí mỗi lần pop: O(log V)
+     - Tổng: **O(V log V)**
+   - **Tổng cộng**: O(V log V + E log V) = **O((V + E) log V)**
+
+2. **Với mảng đơn giản** (không dùng trong dự án):
+   - **O(V²)**
+   - Tìm đỉnh có khoảng cách nhỏ nhất: O(V) × V lần = O(V²)
+   - Cập nhật khoảng cách: O(E)
+   - Tổng: O(V²) (vì V² thường > E)
+
+**Cài đặt trong dự án**: Sử dụng module `heapq` của Python (Binary Min-Heap) → **O((V + E) log V)**
 
 #### Ưu điểm
 - **Đảm bảo tìm được đường đi ngắn nhất** (optimal)
@@ -91,17 +121,46 @@ Trong đó:
 - **f(n)**: Tổng chi phí ước lượng
 
 #### Heuristic sử dụng
-Trong dự án này, chúng ta sử dụng **khoảng cách Euclidean** (đường chim bay):
+Trong dự án này, heuristic được chọn là **khoảng cách Euclidean** (đường chim bay):
 
 ```
 h(n) = sqrt((x_n - x_goal)² + (y_n - y_goal)²)
 ```
 
-Đây là heuristic **admissible** (không overestimate) và **consistent**, đảm bảo A* tìm được đường đi tối ưu.
+**Tính chất quan trọng**:
+- **Admissible**: h(n) không bao giờ overestimate (ước lượng quá cao) chi phí thực tế
+  - Khoảng cách thẳng ≤ khoảng cách đi đường → đảm bảo tính admissible
+- **Consistent** (Monotonic): h(n) ≤ cost(n, n') + h(n') với mọi n'
+  - Bất đẳng thức tam giác luôn đúng với khoảng cách Euclidean
+- Hai tính chất này đảm bảo A* tìm được đường đi **tối ưu**
 
 #### Độ phức tạp thời gian
-- **O((V + E) log V)** trong trường hợp xấu nhất (giống Dijkstra)
-- **Thực tế nhanh hơn nhiều** nhờ heuristic giúp tập trung tìm kiếm
+
+**Phân tích lý thuyết**:
+- **Worst-case**: **O((V + E) log V)** (giống Dijkstra)
+  
+**Giải thích chi tiết**:
+
+1. **Trường hợp xấu nhất** (heuristic không hiệu quả hoặc h(n) = 0):
+   - A* suy biến thành Dijkstra
+   - Phải duyệt hầu hết các đỉnh trong đồ thị
+   - Độ phức tạp: **O((V + E) log V)**
+   
+2. **Trường hợp trung bình** (heuristic tốt):
+   - Heuristic giúp hướng tìm kiếm về phía đích
+   - Số đỉnh cần duyệt giảm đáng kể (thực nghiệm: 44-80% ít hơn Dijkstra)
+   - Độ phức tạp thực tế: **O(b^d)** với b là branching factor hiệu dụng, d là độ sâu
+   - Với heuristic tốt, b giảm mạnh → hiệu suất tăng đáng kể
+
+3. **So sánh với Dijkstra**:
+   - Dijkstra: f(n) = g(n) → duyệt theo vòng tròn đồng tâm từ start
+   - A*: f(n) = g(n) + h(n) → duyệt có hướng về goal
+   - **Kết quả thực nghiệm**: A* giảm 44-80% số nodes, tức là chỉ cần duyệt 20-56% số nodes của Dijkstra
+
+**Kết luận**: 
+- Độ phức tạp worst-case giống Dijkstra nhưng **hiệu suất thực tế cao hơn nhiều**
+- Chất lượng heuristic quyết định mức độ cải thiện
+- Trong bài toán định tuyến với tọa độ Euclidean, A* luôn hiệu quả hơn Dijkstra
 
 #### Ưu điểm
 - **Tối ưu và hiệu quả nhất** khi có heuristic tốt
@@ -111,6 +170,61 @@ h(n) = sqrt((x_n - x_goal)² + (y_n - y_goal)²)
 #### Nhược điểm
 - Cần thông tin heuristic (tọa độ không gian)
 - Phức tạp hơn BFS và Dijkstra
+
+---
+
+### 2.4. So sánh Độ phức tạp Thuật toán
+
+| Thuật toán | Time Complexity | Space Complexity | Cấu trúc dữ liệu chính | Optimal? |
+|------------|-----------------|------------------|------------------------|----------|
+| **BFS** | O(V + E) | O(V) | Queue (FIFO) | ❌ (chỉ với trọng số = 1) |
+| **Dijkstra** | O((V+E) log V) | O(V) | Priority Queue (Min-Heap) | ✅ |
+| **A*** | O((V+E) log V)* | O(V) | Priority Queue (Min-Heap) | ✅ |
+
+**Ghi chú**:
+- **V**: số đỉnh (vertices), **E**: số cạnh (edges)
+- A* có worst-case giống Dijkstra nhưng average-case tốt hơn nhiều
+- Space complexity O(V) cho việc lưu trữ: visited set, parent dict, distances/scores dict
+
+**Phân tích so sánh chi tiết**:
+
+1. **BFS vs Dijkstra/A***:
+   - BFS có độ phức tạp thấp hơn về mặt lý thuyết: O(V+E) < O((V+E) log V)
+   - Tuy nhiên, BFS **không đảm bảo tìm đường đi ngắn nhất** trên đồ thị có trọng số khác nhau
+   - Trade-off không đáng: Hy sinh tính đúng đắn để đổi lấy tốc độ lý thuyết
+   - **Kết luận**: Chỉ dùng BFS khi trọng số bằng nhau hoặc làm baseline
+
+2. **Dijkstra vs A*** (So sánh quan trọng):
+   - **Về lý thuyết**: Cùng worst-case O((V+E) log V)
+   - **Trong thực tế**: A* có **hằng số ẩn nhỏ hơn đáng kể**
+   
+   **Giải thích cụ thể**:
+   - Dijkstra phải duyệt ~100% đỉnh trong trường hợp trung bình
+   - A* chỉ duyệt ~20-80% đỉnh nhờ heuristic (tùy chất lượng h(n))
+   
+   **Ví dụ tính toán**:
+   ```
+   Đồ thị 100 đỉnh, A* duyệt 40 đỉnh (60% ít hơn):
+   
+   Dijkstra: 100 đỉnh × log(100) ≈ 100 × 6.64 = 664 operations
+   A*:        40 đỉnh × log(100) ≈  40 × 6.64 = 266 operations
+   
+   → A* nhanh hơn ~60% (khớp với kết quả thực nghiệm)
+   ```
+
+3. **Vai trò của log V trong hiệu suất**:
+   - Factor log V đến từ operations trên Binary Heap (insert/extract-min)
+   - log tăng rất chậm theo V:
+     - log(10) ≈ 3.3
+     - log(100) ≈ 6.6  (tăng 10 lần V, chỉ tăng 2× log)
+     - log(1000) ≈ 10.0
+   - Điều này giải thích tại sao Dijkstra và A* **scale tốt** với đồ thị lớn
+   - Tuy nhiên, hằng số phía trước (số đỉnh duyệt) mới là yếu tố quyết định → **A* thắng thế**
+
+4. **Tóm tắt**:
+   - O(V + E): Chỉ đúng cho BFS - nhanh nhưng sai
+   - O((V + E) log V): Cả Dijkstra và A* - đúng và hiệu quả
+   - A* có cùng độ phức tạp nhưng **số đỉnh duyệt ít hơn** → hiệu suất thực tế tốt hơn
 
 ---
 
